@@ -86,6 +86,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         }
         if(checkFlag){
 
+            //いえええい！！
+
             //ここからプログラミング
             //振ったと判定されたとき何秒か止める
             //その間に何か処理を入れて動作確認
