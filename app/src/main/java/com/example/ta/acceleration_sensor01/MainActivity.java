@@ -94,10 +94,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         }
         if(checkFlag){
 
-            //ここからプログラミング
-            //振ったと判定されたとき何秒か止める
-            //その間に何か処理を入れて動作確認
-
             sensorManager.unregisterListener(this);
             Log.d(TAG, "Stop The sensor");
             sleep(1000);
