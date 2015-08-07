@@ -13,6 +13,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import java.io.IOException;
+
 public class MainActivity extends AppCompatActivity implements SensorEventListener, View.OnClickListener {
 
     private SensorManager sensorManager;
@@ -86,12 +88,22 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         }
         if(checkFlag){
 
-            //いえええい！！
-
             //ここからプログラミング
             //振ったと判定されたとき何秒か止める
             //その間に何か処理を入れて動作確認
 
+            sensorManager.unregisterListener(this);
+            Log.d("CheckStop", "Stop The sensor");
+            sleep(1000);
+            sensorManager.registerListener(this, accelerometerSensor, SensorManager.SENSOR_DELAY_NORMAL);
+            Log.d("CheckStop", "Restart The sensor");
+        }
+    }
+
+    public synchronized void sleep(long msec){
+        try{
+            wait(msec);
+        }catch(InterruptedException e){
         }
     }
 
