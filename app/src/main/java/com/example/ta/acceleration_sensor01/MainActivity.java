@@ -46,9 +46,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         sensorManager = (SensorManager) getSystemService(this.SENSOR_SERVICE);
         //マネージャから加速度センサーを取得
         accelerometerSensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-        if(sensorFlag == false) {
-            sensorManager.unregisterListener(this);
-        }
     }
 
     public void onClick(View view) {
@@ -96,7 +93,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
             sensorManager.unregisterListener(this);
             Log.d(TAG, "Stop The sensor");
-            sleep(1000);
+            sleep(2000);
             sensorManager.registerListener(this, accelerometerSensor, SensorManager.SENSOR_DELAY_NORMAL);
             Log.d(TAG, "Restart The sensor");
         }
@@ -114,8 +111,12 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     protected void onResume(){
         super.onResume();
-
-        sensorManager.registerListener(this,accelerometerSensor,SensorManager.SENSOR_DELAY_NORMAL);
+        if(sensorFlag == false) {
+            Log.d(TAG,"Init Stop The Sensor");
+            sensorManager.unregisterListener(this);
+        }else {
+            sensorManager.registerListener(this, accelerometerSensor, SensorManager.SENSOR_DELAY_NORMAL);
+        }
     }
 
     protected void onPause(){
