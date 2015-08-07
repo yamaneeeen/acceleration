@@ -11,34 +11,31 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CompoundButton;
+import android.widget.Switch;
 import android.widget.TextView;
 
 import java.io.IOException;
 
-public class MainActivity extends AppCompatActivity implements SensorEventListener, View.OnClickListener {
+public class MainActivity extends AppCompatActivity implements SensorEventListener, View.OnClickListener ,CompoundButton.OnCheckedChangeListener{
 
     private SensorManager sensorManager;
     private Sensor accelerometerSensor;
     private TextView textView1, textView2, textView3,textView4,textView5;
     private Button button1;
-
+    private Switch switch1;
     private float a_x,a_y,a_z,a_x1,a_y1,a_z1,da_x,da_y,da_z;
     private boolean onceFlag;
     private boolean checkFlag;
-
+    private boolean sensorFlag;
     private CalcAcceleration calcAcceleration;
+
+    private static final String TAG = "MainActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        textView1 = (TextView)findViewById(R.id.textView2);
-        textView2 = (TextView)findViewById(R.id.textView3);
-        textView3 = (TextView)findViewById(R.id.textView4);
-        textView4 = (TextView)findViewById(R.id.textView5);
-        textView5 = (TextView)findViewById(R.id.textView6);
-        button1 = (Button)findViewById(R.id.button1);
-        button1.setOnClickListener(this);
+        SetView();
 
         a_x = 0.0f;   a_y = 0.0f; a_z = 0.0f;
         onceFlag = true;
@@ -47,9 +44,11 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
         //センサーマネージャの取得
         sensorManager = (SensorManager) getSystemService(this.SENSOR_SERVICE);
-
         //マネージャから加速度センサーを取得
         accelerometerSensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        if(sensorFlag == false) {
+            sensorManager.unregisterListener(this);
+        }
     }
 
     public void onClick(View view) {
@@ -58,6 +57,15 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 finish();
                 break;
         }
+    }
+
+    public void onCheckedChanged(CompoundButton compoundButton,boolean isChecked){
+        if(isChecked == true){
+            sensorManager.registerListener(this, accelerometerSensor, SensorManager.SENSOR_DELAY_NORMAL);
+        }else{
+            sensorManager.unregisterListener(this);
+        }
+
     }
 
     public void onSensorChanged(SensorEvent event){
@@ -79,8 +87,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             textView1.setText("X = " + a_x );
             textView2.setText("Y = " + a_y );
             textView3.setText("Z = " + a_z );
-            textView4.setText("dx = " + da_x );
-            textView5.setText("dy = " + da_y );
             checkFlag = calcAcceleration.CheckAcceleration(da_x,da_y,da_z);
             a_x1 = a_x;
             a_y1 = a_y;
@@ -93,10 +99,10 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             //その間に何か処理を入れて動作確認
 
             sensorManager.unregisterListener(this);
-            Log.d("CheckStop", "Stop The sensor");
+            Log.d(TAG, "Stop The sensor");
             sleep(1000);
             sensorManager.registerListener(this, accelerometerSensor, SensorManager.SENSOR_DELAY_NORMAL);
-            Log.d("CheckStop", "Restart The sensor");
+            Log.d(TAG, "Restart The sensor");
         }
     }
 
@@ -150,5 +156,20 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    public void SetView(){
+        setContentView(R.layout.activity_main);
+        textView1 = (TextView)findViewById(R.id.textView2);
+        textView2 = (TextView)findViewById(R.id.textView3);
+        textView3 = (TextView)findViewById(R.id.textView4);
+
+        button1 = (Button)findViewById(R.id.button1);
+        button1.setOnClickListener(this);
+
+        switch1 = (Switch)findViewById(R.id.switch1);
+        switch1.setOnCheckedChangeListener(this);
+        sensorFlag = switch1.isChecked();
+        Log.d(TAG,"sensorFlag is " + sensorFlag);
     }
 }

@@ -50,23 +50,16 @@
             android:id="@+id/textView4"
             android:layout_gravity="left" />
 
-        <TextView
+        <Switch
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:text="F = "
-            android:id="@+id/textView5"
-            android:layout_weight="1"
-            android:layout_gravity="left"/>
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:text="dF = "
-            android:id="@+id/textView6"
-            android:layout_weight="1"
-            android:layout_gravity="left"/>
+            android:text="加速度センサー"
+            android:textOn="ON"
+            android:textOff="OFF"
+            android:id="@+id/switch1"
+            android:layout_gravity="center_horizontal"
+            android:checked="false"
+            android:layout_weight="1" />
 
         <Button
             android:layout_width="match_parent"
