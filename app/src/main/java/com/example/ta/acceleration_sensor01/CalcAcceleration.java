@@ -9,20 +9,43 @@ import android.util.Log;
 public class CalcAcceleration {
 
     private static final String TAG = "CalcAcceleration";
+    private static final int NO_SHAKING = 0;
+    private static final int SHAKE_TO_THE_LEFT = 1;
+    private static final int SHAKE_TO_THE_RIGHT = 2;
+    private static final float p_threshold = 10.0f;
+    private static final float n_threshold = -10.0f;
 
-    boolean CheckAcceleration(float da_x,float da_y,float da_z){
-        float dF = (float)Math.sqrt((da_x * da_x) + (da_y * da_y) + (da_z * da_z));
-        if(dF > 5.0f) {
-            if (da_x < -5.0f) {
-                Log.d(TAG, "Shake To The LEFT:" + da_x);
-                return true;
+    public boolean leftShakeFlag = false;
+    public boolean rightShakeFlag = false;
+
+
+    public int CheckAcceleration(float da_x,float da_y,float da_z){
+        /*
+        if (da_x < n_threshold) {
+            if(rightShakeFlag){
+                rightShakeFlag = false;
+                //Log.d(TAG, "Shake To The Right:" + da_x);
+                return SHAKE_TO_THE_RIGHT;
+            }else {
+                leftShakeFlag = true;
             }
-            if (da_x > 5.0f) {
-                Log.d(TAG, "Shake To The RIGHT:" + da_x);
-                return true;
+        }else if (da_x > p_threshold) {
+            if(leftShakeFlag){
+                leftShakeFlag = false;
+                //Log.d(TAG, "Shake To The Left:" + da_x);
+                return SHAKE_TO_THE_LEFT;
+            }else{
+                rightShakeFlag = true;
             }
         }
-        return false;
+        return NO_SHAKING;
+        */
+        if (da_x < n_threshold) {
+            return SHAKE_TO_THE_LEFT;
+        }else if (da_x > p_threshold) {
+            return SHAKE_TO_THE_RIGHT;
+        }
+        return NO_SHAKING;
     }
 
 }

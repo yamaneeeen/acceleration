@@ -3,7 +3,9 @@
     android:layout_height="match_parent" android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    android:paddingBottom="@dimen/activity_vertical_margin" tools:context=".MainActivity">
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:background="#000000"
+    tools:context=".MainActivity">
 
 
     <LinearLayout
@@ -12,54 +14,62 @@
         android:layout_height="match_parent"
         android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true">
+        android:layout_alignParentStart="true"
+        android:gravity="left">
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:text="加速度センサー"
+            android:text="xyz成分の加速度の変化量"
+            android:textColor="#ffffff"
             android:id="@+id/textView1"
-            android:layout_gravity="left" />
+            android:layout_gravity="center"
+            android:textSize="@dimen/abc_text_size_large_material" />
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:text="X = "
+            android:text="da(x)/dt = "
+            android:textColor="#ffffff"
             android:id="@+id/textView2"
-            android:layout_gravity="left" />
+            android:layout_gravity="center"
+            android:textSize="@dimen/abc_text_size_large_material" />
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:text="Y = "
+            android:text="da(y)/dt = "
+            android:textColor="#ffffff"
             android:id="@+id/textView3"
-            android:layout_gravity="left" />
+            android:layout_gravity="center"
+            android:textSize="@dimen/abc_text_size_large_material" />
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:text="Z ="
+            android:text="da(z)/dt = "
+            android:textColor="#ffffff"
             android:id="@+id/textView4"
-            android:layout_gravity="left" />
+            android:layout_gravity="center"
+            android:textSize="@dimen/abc_text_size_large_material" />
 
         <Switch
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="加速度センサー"
+            android:text="加速度センサーの切り替え"
             android:textOn="ON"
             android:textOff="OFF"
+            android:textColor="#ffffff"
             android:id="@+id/switch1"
             android:layout_gravity="center_horizontal"
             android:checked="false"
-            android:layout_weight="1" />
+            android:singleLine="false"
+            android:layout_weight="1"
+            android:textSize="@dimen/abc_text_size_large_material" />
 
         <Button
             android:layout_width="match_parent"
@@ -67,7 +77,8 @@
             android:text="終了"
             android:id="@+id/button1"
             android:layout_gravity="center_horizontal"
-            android:layout_weight="1" />
+            android:layout_weight="1"
+            android:textSize="@dimen/abc_text_size_large_material" />
     </LinearLayout>
 
 </RelativeLayout>

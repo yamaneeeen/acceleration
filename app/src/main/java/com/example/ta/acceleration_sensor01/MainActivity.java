@@ -2,6 +2,7 @@ package com.example.ta.acceleration_sensor01;
 
 import android.app.ActivityManager;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -19,6 +20,7 @@ import android.widget.Switch;
 import android.widget.TextView;
 
 import java.io.IOException;
+import java.text.NumberFormat;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener ,CompoundButton.OnCheckedChangeListener{
@@ -29,16 +31,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private Switch switch1;
     private float a_x,a_y,a_z,a_x1,a_y1,a_z1,da_x,da_y,da_z;
     private CalcAcceleration calcAcceleration;
-
     private boolean sensorFlag;
+    private ActivityBroadcastReceiver activityBroadcastReceiver;
+    private Intent sendIntent;
+    private NumberFormat format;
 
-    private static final String TAG = "MainActivity";
+    public static final String TAG = "MainActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         SetView();
 
+        sendIntent = new Intent(TAG);
+        sendIntent.putExtra("activityFlag", true);
         a_x = 0.0f;   a_y = 0.0f; a_z = 0.0f;
         sensorFlag = false;
     }
@@ -52,7 +58,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     public void onCheckedChanged(CompoundButton compoundButton,boolean isChecked){
-        Log.d(TAG, "Button is " + isChecked);
+        //Log.d(TAG, "Button is " + isChecked);
         Intent intent = new Intent(getApplication(),AccelerationService.class);
         if(isChecked == true) {
             startService(intent);
@@ -67,10 +73,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         int i = 0;
         ActivityManager activityManager =(ActivityManager)getSystemService(ACTIVITY_SERVICE);
         List<ActivityManager.RunningServiceInfo> list = activityManager.getRunningServices(Integer.MAX_VALUE);
-        Log.d(TAG,AccelerationService.class.getName());
+        Log.d(TAG, AccelerationService.class.getName());
         while(i <= list.size()-1){
             Log.d(TAG,list.get(i).service.getClassName());
-            if(AccelerationService.class.getName().equalsIgnoreCase(list.get(i).toString())) {
+            if(AccelerationService.class.getName().equalsIgnoreCase(list.get(i).service.getClassName())) {
                 Log.d(TAG, "Service  Is Moving");
                 sensorFlag = true;
                 break;
@@ -78,16 +84,30 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             i++;
         }
         switch1.setChecked(sensorFlag);
+
+
+        sendIntent.putExtra("movingFlag", true);
+        sendBroadcast(sendIntent);
+
+        activityBroadcastReceiver = new ActivityBroadcastReceiver();
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(AccelerationService.TAG);
+        registerReceiver(activityBroadcastReceiver, intentFilter);
+
+        format = NumberFormat.getInstance();
+        format.setMaximumFractionDigits(2);
     }
 
     protected void onPause(){
         super.onPause();
+        sendIntent.putExtra("movingFlag",false);
+        sendBroadcast(sendIntent);
     }
 
 
     protected void onDestroy() {
         super.onDestroy();
-
+        unregisterReceiver(activityBroadcastReceiver);
     }
 
     @Override
@@ -123,5 +143,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         switch1 = (Switch)findViewById(R.id.switch1);
         switch1.setOnCheckedChangeListener(this);
+    }
+
+    public void SetText(float da_x,float da_y,float da_z){
+        textView1.setText("da(x)/dt = "+format.format(da_x));
+        textView2.setText("da(y)/dt = "+format.format(da_y));
+        textView3.setText("da(z)/dt = "+format.format(da_z));
     }
 }
