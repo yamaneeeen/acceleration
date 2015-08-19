@@ -1,9 +1,12 @@
 package com.example.ta.acceleration_sensor01;
 
+import android.app.ActivityManager;
+import android.content.Intent;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.os.Debug;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -16,19 +19,18 @@ import android.widget.Switch;
 import android.widget.TextView;
 
 import java.io.IOException;
+import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements SensorEventListener, View.OnClickListener ,CompoundButton.OnCheckedChangeListener{
+public class MainActivity extends AppCompatActivity implements View.OnClickListener ,CompoundButton.OnCheckedChangeListener{
 
-    private SensorManager sensorManager;
-    private Sensor accelerometerSensor;
+
     private TextView textView1, textView2, textView3,textView4,textView5;
     private Button button1;
     private Switch switch1;
     private float a_x,a_y,a_z,a_x1,a_y1,a_z1,da_x,da_y,da_z;
-    private boolean onceFlag;
-    private boolean checkFlag;
-    private boolean sensorFlag;
     private CalcAcceleration calcAcceleration;
+
+    private boolean sensorFlag;
 
     private static final String TAG = "MainActivity";
 
@@ -38,17 +40,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         SetView();
 
         a_x = 0.0f;   a_y = 0.0f; a_z = 0.0f;
-        onceFlag = true;
-        checkFlag = false;
-        calcAcceleration = new CalcAcceleration();
-
-        //センサーマネージャの取得
-        sensorManager = (SensorManager) getSystemService(this.SENSOR_SERVICE);
-        //マネージャから加速度センサーを取得
-        accelerometerSensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-        if(sensorFlag == false) {
-            sensorManager.unregisterListener(this);
-        }
+        sensorFlag = false;
     }
 
     public void onClick(View view) {
@@ -60,76 +52,42 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     }
 
     public void onCheckedChanged(CompoundButton compoundButton,boolean isChecked){
-        if(isChecked == true){
-            sensorManager.registerListener(this, accelerometerSensor, SensorManager.SENSOR_DELAY_NORMAL);
+        Log.d(TAG, "Button is " + isChecked);
+        Intent intent = new Intent(getApplication(),AccelerationService.class);
+        if(isChecked == true) {
+            startService(intent);
         }else{
-            sensorManager.unregisterListener(this);
-        }
-
-    }
-
-    public void onSensorChanged(SensorEvent event){
-        if(event.sensor.getType() == Sensor.TYPE_ACCELEROMETER){
-            a_x = event.values[0];
-            a_y = event.values[1];
-            a_z = event.values[2];
-            if(onceFlag) {
-                da_x = a_x;
-                da_y = a_y;
-                da_z = a_z;
-                onceFlag = false;
-            }else{
-                da_x = a_x1 - a_x;
-                da_y = a_y1 - a_y;
-                da_z = a_z1 - a_z;
-            }
-
-            textView1.setText("X = " + a_x );
-            textView2.setText("Y = " + a_y );
-            textView3.setText("Z = " + a_z );
-            checkFlag = calcAcceleration.CheckAcceleration(da_x,da_y,da_z);
-            a_x1 = a_x;
-            a_y1 = a_y;
-            a_z1 = a_z;
-        }
-        if(checkFlag){
-
-            sensorManager.unregisterListener(this);
-            Log.d(TAG, "Stop The sensor");
-            sleep(1000);
-            sensorManager.registerListener(this, accelerometerSensor, SensorManager.SENSOR_DELAY_NORMAL);
-            Log.d(TAG, "Restart The sensor");
+            stopService(intent);
         }
     }
 
-    public synchronized void sleep(long msec){
-        try{
-            wait(msec);
-        }catch(InterruptedException e){
-        }
-    }
-
-    public void onAccuracyChanged(Sensor sensor,int accuracy){
-    }
 
     protected void onResume(){
         super.onResume();
-
-        sensorManager.registerListener(this,accelerometerSensor,SensorManager.SENSOR_DELAY_NORMAL);
+        int i = 0;
+        ActivityManager activityManager =(ActivityManager)getSystemService(ACTIVITY_SERVICE);
+        List<ActivityManager.RunningServiceInfo> list = activityManager.getRunningServices(Integer.MAX_VALUE);
+        Log.d(TAG,AccelerationService.class.getName());
+        while(i <= list.size()-1){
+            Log.d(TAG,list.get(i).service.getClassName());
+            if(AccelerationService.class.getName().equalsIgnoreCase(list.get(i).toString())) {
+                Log.d(TAG, "Service  Is Moving");
+                sensorFlag = true;
+                break;
+            }
+            i++;
+        }
+        switch1.setChecked(sensorFlag);
     }
 
     protected void onPause(){
         super.onPause();
-
-        sensorManager.unregisterListener(this);
     }
 
 
     protected void onDestroy() {
         super.onDestroy();
-        accelerometerSensor = null;
-        sensorManager.unregisterListener(this);
-        sensorManager = null;
+
     }
 
     @Override
@@ -165,7 +123,5 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
         switch1 = (Switch)findViewById(R.id.switch1);
         switch1.setOnCheckedChangeListener(this);
-        sensorFlag = switch1.isChecked();
-        Log.d(TAG,"sensorFlag is " + sensorFlag);
     }
 }
